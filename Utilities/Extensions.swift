@@ -1,8 +1,12 @@
-//
-//  Extensions.swift
-//  GameTest
-//
-//  Created by MacBookAir on 21.05.25.
-//
+import SpriteKit
 
-import Foundation
+extension SKScene {
+    func showAlert(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .default))
+        
+        if let viewController = self.view?.window?.rootViewController {
+            viewController.present(alertController, animated: true)
+        }
+    }
+}
