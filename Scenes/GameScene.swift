@@ -5,6 +5,16 @@ class GameScene: SKScene {
     private let cardSize = CGSize(width: 77, height: 77)
     private let spacing: CGFloat = 15
     private let fieldMargin = UIEdgeInsets(top: 100, left: 20, bottom: 20, right: 20)
+    private var backButton: SKSpriteNode!
+    private var pauseButton: SKSpriteNode!
+    private var reloadButton: SKSpriteNode!
+    
+    
+    private var isGamePaused = false
+    private var pauseOverlay: SKSpriteNode!
+    private var continueButton: SKSpriteNode!
+    private var pauseTimeStamp: TimeInterval = 0
+    
     
     private var cards: [Card] = []
     private var selectedCards: [Card] = []
@@ -22,12 +32,34 @@ class GameScene: SKScene {
     
     override func didMove(to view: SKView) {
         startTime = CACurrentMediaTime()
-        
         UIElements()
         setupCards()
+        createPauseUI()
     }
     
     private func UIElements() {
+        
+        backButton = SKSpriteNode(imageNamed: "back")
+        backButton.position = CGPoint(x: size.width/6.2, y: size.height/7)
+        backButton.size = CGSize(width: 43, height: 43)
+        backButton.zPosition = 3
+        backButton.name = "back"
+        addChild(backButton)
+        
+        pauseButton = SKSpriteNode(imageNamed: "pause")
+        pauseButton.position = CGPoint(x: size.width/2, y: size.height/7)
+        pauseButton.size = CGSize(width: 43, height: 43)
+        pauseButton.zPosition = 3
+        pauseButton.name = "pause"
+        addChild(pauseButton)
+        
+        
+        reloadButton = SKSpriteNode(imageNamed: "reload")
+        reloadButton.position = CGPoint(x: size.width/1.2, y: size.height/7)
+        reloadButton.size = CGSize(width: 43, height: 43)
+        reloadButton.zPosition = 3
+        reloadButton.name = "reloadButton"
+        addChild(reloadButton)
         
         background = SKSpriteNode(imageNamed: "backgroundGame")
         background.position = CGPoint(x: size.width/2, y: size.height/2)
@@ -56,9 +88,9 @@ class GameScene: SKScene {
         
         // Кнопка настроек
         settingsButton = SKSpriteNode(imageNamed: "settings")
-        settingsButton.position = CGPoint(x: size.width/8, y: size.height/1.15)
+        settingsButton.position = CGPoint(x: size.width/10, y: size.height/1.2)
         settingsButton.name = "settingsButton"
-        settingsButton.setScale(0.5)
+        settingsButton.size = CGSize(width: 43, height: 43)
         addChild(settingsButton)
         
         // Кнопка с количеством ходов и таймером
@@ -115,11 +147,13 @@ class GameScene: SKScene {
                     SKAction.wait(forDuration: 2.0),
                     SKAction.run { card.flipToBack() }
                 ])
+                card.currentFlipSequence = flipSequence
                 card.run(flipSequence)
                 
             }
         }
     }
+    
     override func update(_ currentTime: TimeInterval) {
         elapsedTime = currentTime - startTime
         let minutes = Int(elapsedTime) / 60
@@ -140,9 +174,28 @@ class GameScene: SKScene {
                 let settingsScene = SettingsScene(size: size)
                 settingsScene.scaleMode = scaleMode
                 settingsScene.backToMenu = false
+                pauseGame()
                 view?.presentScene(settingsScene, transition: SKTransition.push(with: .left, duration: 0.3))
                 return
+                // новые кнопки
+            } else if node.name == "back" {
+                transitionToMainMenu()
+            }else if node.name == "reloadButton"{
+                restartGame()
+            }else if node.name == "pause"{
+                isGamePaused ? resumeGame() : pauseGame()
+                AudioManager.shared.playEffect(.buttonClick)
+                VibrationManager.shared.vibrate()
+                return
+            } else if node.name == "continueButton" {
+                resumeGame()
+                AudioManager.shared.playEffect(.buttonClick)
+                VibrationManager.shared.vibrate()
+                return
             }
+            
+            // Блокируем взаимодействие с карточками при паузе
+            guard !isGamePaused else { continue }
             
             guard let card = node as? Card, !card.isFlipped, selectedCards.count < 2 else { continue }
             
@@ -189,5 +242,108 @@ class GameScene: SKScene {
         winScene.time = elapsedTime
         view?.presentScene(winScene, transition: SKTransition.moveIn(with: .down, duration: 0.5))
     }
+    
+    private func transitionToMainMenu() {
+        let menuScene = MenuScene(size: self.size)
+        menuScene.scaleMode = self.scaleMode
+        view?.presentScene(menuScene, transition: SKTransition.doorsCloseVertical(withDuration: 0.5))
+    }
+    
+    private func restartGame() {
+        
+        cards.forEach { $0.removeFromParent() }
+        cards.removeAll()
+        selectedCards.removeAll()
+        setupCards()
+        movesCount = 0
+        movesLabel.text = "Moves: \(movesCount)"
+        startTime = CACurrentMediaTime()
+        elapsedTime = 0
+        timerLabel.text = "Time: 00:00"
+    }
+    
+    private func createPauseUI(){
+        // Затемнение экрана
+        pauseOverlay = SKSpriteNode(color: .black.withAlphaComponent(0.7), size: size)
+        pauseOverlay.position = CGPoint(x: size.width/2, y: size.height/2)
+        pauseOverlay.zPosition = 10
+        pauseOverlay.isHidden = true
+        addChild(pauseOverlay)
+        
+        // Текст "PAUSED"
+        let pauseLabel = SKLabelNode(text: "PAUSED")
+        pauseLabel.fontName = "Avenir-Black"
+        pauseLabel.fontSize = 48
+        pauseLabel.fontColor = .white
+        pauseLabel.position = CGPoint(x: 0, y: 50)
+        pauseLabel.zPosition = 11
+        pauseOverlay.addChild(pauseLabel)
+        
+        // Кнопка продолжения
+        continueButton = SKSpriteNode(imageNamed: "play") // Используйте свою текстуру
+        continueButton.position = CGPoint(x: 0, y: -50)
+        continueButton.zPosition = 11
+        continueButton.name = "continueButton"
+        pauseOverlay.addChild(continueButton)
+    }
+    
+    private func pauseGame() {
+        
+        guard !isGamePaused else { return }
+        
+        isGamePaused = true
+        pauseTimeStamp = CACurrentMediaTime()
+        
+        
+        // Сохраняем текущие анимации и останавливаем их
+        cards.forEach { card in
+            card.flipAnimation = card.action(forKey: "flipAnimation")
+            card.removeAllActions()
+        }
+        // 1. Скрываем все карточки
+        cards.forEach { $0.isHidden = true }
+        
+        // 2. Блокируем взаимодействие с карточками
+        cards.forEach { $0.isUserInteractionEnabled = false }
+        
+        // 3. Показываем оверлей паузы
+        pauseOverlay.isHidden = false
+        
+        // 4. Обновляем кнопку паузы
+        pauseButton.texture = SKTexture(imageNamed: "play") // Меняем на "продолжить"
+        
+        
+    }
+    
+    private func resumeGame() {
+        guard isGamePaused else { return }
+        
+        isGamePaused = false
+        
+        // 1. Корректируем таймер с учетом паузы
+        let pauseDuration = CACurrentMediaTime() - pauseTimeStamp
+        startTime += pauseDuration
+        
+        // 2. Показываем карточки
+        cards.forEach { $0.isHidden = false }
+        
+        // 3. Разблокируем карточки
+        cards.forEach { $0.isUserInteractionEnabled = true }
+        
+        // 4. Скрываем оверлей паузы
+        pauseOverlay.isHidden = true
+        
+        cards.forEach { card in
+            if let flipAnimation = card.flipAnimation {
+                card.run(flipAnimation, withKey: "flipAnimation")
+            } else if let flipSequence = card.currentFlipSequence {
+                card.run(flipSequence, withKey: "flipAnimation")
+            }
+        }
+        
+        // 5. Возвращаем иконку паузы
+        pauseButton.texture = SKTexture(imageNamed: "pause")
+    }
+    
 }
 

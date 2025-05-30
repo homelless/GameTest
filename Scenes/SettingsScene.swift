@@ -1,6 +1,7 @@
 import SpriteKit
 
 class SettingsScene: SKScene {
+
     var backToMenu: Bool = true
     private var soundButton: SKSpriteNode!
     private var vibrationButton: SKSpriteNode!

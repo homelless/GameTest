@@ -4,6 +4,10 @@ class Card: SKSpriteNode {
     let type: String
     var isFlipped = false
     var frontTexture: SKTexture
+    
+    var flipAnimation: SKAction?
+    var currentFlipSequence: SKAction?
+    
     private var backTexture = SKTexture(imageNamed: "card_back")
     
   

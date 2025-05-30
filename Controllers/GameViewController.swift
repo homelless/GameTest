@@ -13,8 +13,8 @@ class GameViewController: UIViewController {
         
         let skView = self.view as! SKView
 
-        //let scene = GameScene(size: skView.bounds.size)
-        let scene = LoadingScene(size: skView.bounds.size)
+        let scene = GameScene(size: skView.bounds.size)
+       // let scene = LoadingScene(size: skView.bounds.size)
         scene.scaleMode = .aspectFill
         
         skView.presentScene(scene)
