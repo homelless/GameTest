@@ -1,6 +1,11 @@
 import SpriteKit
 
 class GameScene: SKScene {
+    
+    private let cardSize = CGSize(width: 77, height: 77)
+    private let spacing: CGFloat = 15
+    private let fieldMargin = UIEdgeInsets(top: 100, left: 20, bottom: 20, right: 20)
+    
     private var cards: [Card] = []
     private var selectedCards: [Card] = []
     private var movesCount = 0
@@ -9,42 +14,61 @@ class GameScene: SKScene {
     private var timerLabel: SKLabelNode!
     private var movesLabel: SKLabelNode!
     private var settingsButton: SKSpriteNode!
-    
+    private var background: SKSpriteNode!
+    private var labelMovesTimer : SKSpriteNode!
     private let cardTypes = ["card1", "card2", "card3", "card4", "card5", "card6", "card7", "card8"]
     private let rows = 4
     private let cols = 4
     
     override func didMove(to view: SKView) {
-        backgroundColor = UIColor(red: 0.1, green: 0.1, blue: 0.2, alpha: 1.0)
         startTime = CACurrentMediaTime()
         
-        setupUI()
+        UIElements()
         setupCards()
     }
     
-    private func setupUI() {
+    private func UIElements() {
+        
+        background = SKSpriteNode(imageNamed: "backgroundGame")
+        background.position = CGPoint(x: size.width/2, y: size.height/2)
+        background.zPosition = -1
+        background.size = self.size
+        addChild(background)
+        
+        
         // Таймер
         timerLabel = SKLabelNode(text: "Time: 0")
         timerLabel.fontName = "Avenir-Bold"
         timerLabel.fontSize = 20
         timerLabel.fontColor = .white
-        timerLabel.position = CGPoint(x: size.width * 0.25, y: size.height - 50)
+        timerLabel.zPosition = 3
+        timerLabel.position = CGPoint(x: size.width/1.3, y: size.height/1.313)
         addChild(timerLabel)
         
         // Счетчик ходов
-        movesLabel = SKLabelNode(text: "Moves: 0")
+        movesLabel = SKLabelNode(text: "Movies: 0")
         movesLabel.fontName = "Avenir-Bold"
         movesLabel.fontSize = 20
         movesLabel.fontColor = .white
-        movesLabel.position = CGPoint(x: size.width * 0.75, y: size.height - 50)
+        movesLabel.zPosition = 3
+        movesLabel.position = CGPoint(x: size.width/5.5, y: size.height/1.313)
         addChild(movesLabel)
         
         // Кнопка настроек
         settingsButton = SKSpriteNode(imageNamed: "settings")
-        settingsButton.position = CGPoint(x: size.width - 40, y: size.height - 40)
+        settingsButton.position = CGPoint(x: size.width/8, y: size.height/1.15)
         settingsButton.name = "settingsButton"
         settingsButton.setScale(0.5)
         addChild(settingsButton)
+        
+        // Кнопка с количеством ходов и таймером
+        labelMovesTimer = SKSpriteNode(imageNamed: "groupMoves&timer")
+        labelMovesTimer.position = CGPoint(x: size.width/2, y: size.height/1.3)
+        labelMovesTimer.size = CGSize(width: 380, height: 42)
+        labelMovesTimer.zPosition = 2
+        addChild(labelMovesTimer)
+        
+        
     }
     
     private func setupCards() {
@@ -52,10 +76,22 @@ class GameScene: SKScene {
         var cardPairs = cardTypes + cardTypes
         cardPairs.shuffle()
         
-        let cardWidth: CGFloat = size.width * 0.2
-        let cardHeight: CGFloat = size.height * 0.2
-        let horizontalSpacing: CGFloat = (size.width - (CGFloat(cols) * cardWidth)) / (CGFloat(cols) + 1)
-        let verticalSpacing: CGFloat = (size.height - 100 - (CGFloat(rows) * cardHeight)) / (CGFloat(rows) + 1)
+        // Расчет начальрой позиции
+        let fieldWidht = size.width - fieldMargin.left - fieldMargin.right
+        let fieldHeight = size.height - fieldMargin.top - fieldMargin.bottom
+        
+        //Проверяем, помещаются ли карты с текущими настройками
+        let requiredWigth = CGFloat(cols) * cardSize.width + CGFloat(cols - 1) * spacing
+        let requiredHeght = CGFloat(rows) * cardSize.height + CGFloat(rows - 1) * spacing
+        
+        guard requiredWigth <= fieldWidht && requiredHeght <= fieldHeight else {
+            print("Ошибка: Карты не помещаются на поле с текущими настройками")
+            return
+        }
+        
+        // Центрируем карты на доступном поле
+        let startX = fieldMargin.left + (fieldWidht - requiredWigth) / 2
+        let startY = fieldMargin.bottom + (fieldHeight - requiredHeght) / 2
         
         for row in 0..<rows {
             for col in 0..<cols {
@@ -63,12 +99,11 @@ class GameScene: SKScene {
                 let cardType = cardPairs[index]
                 
                 let card = Card(type: cardType)
-                card.position = CGPoint(
-                    x: horizontalSpacing + CGFloat(col) * (cardWidth + horizontalSpacing) + cardWidth/2,
-                    y: 50 + verticalSpacing + CGFloat(row) * (cardHeight + verticalSpacing) + cardHeight/2
-                )
-                card.size = CGSize(width: cardWidth, height: cardHeight)
-                card.name = "card_\(row)_\(col)"
+                card.position = CGPoint(x: startX + CGFloat(col) * (cardSize.width + spacing) + cardSize.width/2,
+                                        y: startY + CGFloat(row) * (cardSize.height + spacing) + cardSize.height/2)
+                
+                card.size = cardSize
+                card.name = "card\(row)_\(col)"
                 
                 addChild(card)
                 cards.append(card)
@@ -81,10 +116,10 @@ class GameScene: SKScene {
                     SKAction.run { card.flipToBack() }
                 ])
                 card.run(flipSequence)
+                
             }
         }
     }
-    
     override func update(_ currentTime: TimeInterval) {
         elapsedTime = currentTime - startTime
         let minutes = Int(elapsedTime) / 60
@@ -126,11 +161,10 @@ class GameScene: SKScene {
                     VibrationManager.shared.vibrate(for: .success)
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.selectedCards.forEach { $0.removeFromParent() }
                         self.selectedCards.removeAll()
                         
                         // Проверка на завершение игры
-                        if self.cards.allSatisfy({ $0.parent == nil }) {
+                        if self.cards.allSatisfy({ $0.isFlipped }) {
                             self.gameWin()
                         }
                     }
@@ -153,6 +187,7 @@ class GameScene: SKScene {
         winScene.scaleMode = scaleMode
         winScene.moves = movesCount
         winScene.time = elapsedTime
-        view?.presentScene(winScene, transition: SKTransition.fade(withDuration: 0.5))
+        view?.presentScene(winScene, transition: SKTransition.moveIn(with: .down, duration: 0.5))
     }
 }
+

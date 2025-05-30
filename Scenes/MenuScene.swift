@@ -45,10 +45,8 @@ class MenuScene: SKScene {
                 AudioManager.shared.playEffect(.buttonClick)
                 VibrationManager.shared.vibrate()
                 
-                if let url = URL(string: "https://example.com/privacy-policy") {
-                    let safariVC = SFSafariViewController(url: url)
-                    viewController?.present(safariVC, animated: true)
-                }
+                if let url = URL(string: "https://en.wikipedia.org/wiki/Privacy_policy#:~:text=A%20privacy%20policy%20is%20a,a%20customer%20or%20client's%20data.") {
+                    UIApplication.shared.open(url)                }
             }
             else if node.name == "settingsButton" {
                 AudioManager.shared.playEffect(.buttonClick)
@@ -111,37 +109,45 @@ class MenuScene: SKScene {
         starsThree.size = CGSize(width: 280, height: 200)
         addChild(starsThree)
         
-        
+
         loadingLight = SKSpriteNode(imageNamed: "light")
-        loadingLight.position = CGPoint(x: size.width/2, y: size.height/1.5)
-        loadingLight.zPosition = 10
-        loadingLight.size = CGSize(width: 250, height: 300)
+        loadingLight.position = CGPoint(x: size.width/1.9, y: size.height/1.3)
+        loadingLight.zPosition = 1
+        loadingLight.size = CGSize(width: 301, height: 460)
         addChild(loadingLight)
         
         playButton = SKSpriteNode(imageNamed: "playButton")
+        playButton.name = "playButton"
         playButton.position = CGPoint(x: size.width/2, y: size.height/2.5)
         playButton.zPosition = 1
-        playButton.size = CGSize(width: <#T##Int#>, height: <#T##Int#>)
+        playButton.size = CGSize(width: 250, height: 61)
         addChild(playButton)
         
+        cap = SKSpriteNode(imageNamed: "cap")
+        cap.position = CGPoint(x: size.width/2, y: size.height/1.65)
+        cap.zPosition = 2
+        cap.size = CGSize(width: 330, height: 330)
+        addChild(cap)
         
         privacyButton = SKSpriteNode(imageNamed: "privacyButton")
-        cap = SKSpriteNode(imageNamed: "cap")
+        privacyButton.name = "privacyButton"
+        privacyButton.position = CGPoint(x: size.width/2, y: size.height/4)
+        privacyButton.zPosition = 2
+        privacyButton.size = CGSize(width: 160, height: 31)
+        addChild(privacyButton)
+        
+        settingsButton = SKSpriteNode(imageNamed: "settings")
+        settingsButton.name = "settingsButton"
+        settingsButton.position = CGPoint(x: size.width/1.1, y: size.height/1.1)
+        settingsButton.zPosition = 2
+        settingsButton.size = CGSize(width: 43, height: 43)
+        addChild(settingsButton)
         
         
     }
     
     
-    func convertSize (_ figmaSize: CGSize) -> CGSize {
-        let screenWight = UIScreen.main.bounds.width
-        let figmaWight: CGFloat = 1080
-        
-        let scaleFactor = screenWight / figmaWight
-        
-        return CGSize(width: figmaSize.width * scaleFactor,
-                      height: figmaSize.height * scaleFactor)
-
-    }
+    
     
     
 }

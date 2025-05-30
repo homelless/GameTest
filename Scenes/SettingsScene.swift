@@ -72,6 +72,8 @@ class SettingsScene: SKScene {
         backButton.addChild(backLabel)
         
         addChild(backButton)
+        
+        
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

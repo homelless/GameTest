@@ -21,8 +21,8 @@ class LoadingScene: SKScene {
         
     override func didMove(to view: SKView) {
         UIElement()
+//        startAnimations()
         startLoadingAnimation()
-        startAnimations()
         startTransitionTimer()
     }
     
@@ -44,17 +44,19 @@ class LoadingScene: SKScene {
     }
     
     private func startAnimations() {
-        // Анимация движения огонька вверх-вниз
-        let moveUp = SKAction.moveTo(y: size.height * 0.8, duration: 2.5)
-        moveUp.timingMode = .easeInEaseOut
-        
-        let moveDown = SKAction.moveTo(y: size.height/4, duration: 2.5)
-        moveDown.timingMode = .easeInEaseOut
-        
-        let bounceSequence = SKAction.sequence([moveUp, moveDown])
-        
-        loadingLight.run(SKAction.repeatForever(bounceSequence))
-    }
+            
+            // Анимация движения огонька вверх-вниз
+        let moveUp = SKAction.moveTo(y: size.height * 0.85, duration: 2.5)
+            moveUp.timingMode = .easeInEaseOut
+            
+            let moveDown = SKAction.moveTo(y: size.height/4, duration: 2.5)
+            moveDown.timingMode = .easeInEaseOut
+            
+            let bounceSequence = SKAction.sequence([moveDown, moveUp])
+            
+            loadingLight.run(SKAction.repeatForever(bounceSequence))
+        }
+
     
     private func UIElement() {
         backgroundNode = SKSpriteNode(imageNamed: "background")
@@ -108,10 +110,12 @@ class LoadingScene: SKScene {
         
         
         loadingLight = SKSpriteNode(imageNamed: "light")
-        loadingLight.position = CGPoint(x: size.width/2, y: size.height/4)
-        loadingLight.zPosition = 10
-        loadingLight.size = CGSize(width: 250, height: 300)
+        loadingLight.position = CGPoint(x: size.width/1.9, y: size.height/1.25)
+        loadingLight.zPosition = 5
+        loadingLight.size = CGSize(width: 301, height: 460)
         addChild(loadingLight)
+        
+        startAnimations()
         
         loadingLabel = SKLabelNode(text: "Loading...")
         loadingLabel.fontName = "Avenir-Bold"
@@ -121,11 +125,13 @@ class LoadingScene: SKScene {
         addChild(loadingLabel)
         
         
+        
+
     }
     
     private func startTransitionTimer() {
         
-        let waitAction = SKAction.wait(forDuration: 1.0)
+        let waitAction = SKAction.wait(forDuration: 4.0)
         let transitionAction = SKAction.run { [weak self] in
             self?.transitionToMainMenu()
         }

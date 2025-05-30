@@ -3,9 +3,10 @@ import SpriteKit
 class Card: SKSpriteNode {
     let type: String
     var isFlipped = false
-    private var frontTexture: SKTexture
+    var frontTexture: SKTexture
     private var backTexture = SKTexture(imageNamed: "card_back")
     
+  
     init(type: String) {
         self.type = type
         self.frontTexture = SKTexture(imageNamed: type)
