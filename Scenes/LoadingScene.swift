@@ -1,141 +1,132 @@
-//
-//  LoadingScene.swift
-//  GameTest
-//
-//  Created by MacBookAir on 21.05.25.
-//
+
 import SpriteKit
 
-class LoadingScene: SKScene {
+final class LoadingScene: SKScene {
     
-    private var backgroundNode: SKSpriteNode!
-    private var loadingLabel: SKLabelNode!
-    private var loadingLight: SKSpriteNode!
-    private var grape: SKSpriteNode!
-    private var lemon: SKSpriteNode!
-    private var orange: SKSpriteNode!
-    private var cherries: SKSpriteNode!
-    private var starsOne: SKSpriteNode!
-    private var starsTwo: SKSpriteNode!
-    private var starsThree: SKSpriteNode!
-        
-    override func didMove(to view: SKView) {
-        UIElement()
-//        startAnimations()
-        startLoadingAnimation()
-        startTransitionTimer()
+    // MARK: - Constants
+    private enum Constants {
+        static let loadingDuration: TimeInterval = 4.0
+        static let fadeDuration: TimeInterval = 1.0
+        static let blinkDuration: TimeInterval = 1.0
+        static let bounceDuration: TimeInterval = 2.5
+        static let loadingText = "Loading..."
+        static let fontName = "Avenir-Bold"
+        static let fontSize: CGFloat = 21
     }
     
+    // MARK: - Nodes
+    private lazy var backgroundNode: SKSpriteNode = {
+        let node = SKSpriteNode(imageNamed: "background")
+        node.position = CGPoint(x: size.width/2, y: size.height/2)
+        node.size = self.size
+        node.zPosition = -1
+        return node
+    }()
     
-    private func transitionToMainMenu() {
-        let menuScene = MenuScene(size: self.size)
-        menuScene.scaleMode = self.scaleMode
-        view?.presentScene(menuScene, transition: SKTransition.fade(withDuration: 1.0))
-        
+    private lazy var loadingLabel: SKLabelNode = {
+        let label = SKLabelNode(text: Constants.loadingText)
+        label.fontName = Constants.fontName
+        label.fontSize = Constants.fontSize
+        label.fontColor = .white
+        label.position = CGPoint(x: size.width/2, y: size.height/2)
+        return label
+    }()
+    
+    private lazy var loadingLight: SKSpriteNode = {
+        let node = SKSpriteNode(imageNamed: "light")
+        node.position = CGPoint(x: size.width/1.9, y: size.height/1.25)
+        node.zPosition = 5
+        node.size = CGSize(width: 301, height: 460)
+        return node
+    }()
+    
+    private lazy var fruitNodes: [SKSpriteNode] = {
+        let grape = createFruitNode(imageNamed: "grape", position: CGPoint(x: size.width/1.3, y: size.height/1.15), size: CGSize(width: 70, height: 70))
+        let lemon = createFruitNode(imageNamed: "lemon", position: CGPoint(x: size.width/8, y: size.height/3.2), size: CGSize(width: 45, height: 55))
+        let orange = createFruitNode(imageNamed: "orange", position: CGPoint(x: size.width/1.1, y: size.height/7.5), size: CGSize(width: 70, height: 80))
+        let cherries = createFruitNode(imageNamed: "cherries", position: CGPoint(x: size.width/1.08, y: size.height/2.3), size: CGSize(width: 110, height: 120))
+        return [grape, lemon, orange, cherries]
+    }()
+    
+    private lazy var starNodes: [SKSpriteNode] = {
+        let starsOne = createStarNode(imageNamed: "starsOne", position: CGPoint(x: size.width/3.4, y: size.height/1.2), size: CGSize(width: 220, height: 180))
+        let starsTwo = createStarNode(imageNamed: "starsTwo", position: CGPoint(x: size.width/1.5, y: size.height/1.8), size: CGSize(width: 300, height: 222))
+        let starsThree = createStarNode(imageNamed: "starsThree", position: CGPoint(x: size.width/2.7, y: size.height/4.6), size: CGSize(width: 280, height: 200))
+        return [starsOne, starsTwo, starsThree]
+    }()
+    
+    // MARK: - Lifecycle
+    override func didMove(to view: SKView) {
+        super.didMove(to: view)
+        setupScene()
+        startAnimations()
+        scheduleTransition()
+    }
+    
+    // MARK: - Scene Setup
+    private func setupScene() {
+        addChild(backgroundNode)
+        fruitNodes.forEach { addChild($0) }
+        starNodes.forEach { addChild($0) }
+        addChild(loadingLight)
+        addChild(loadingLabel)
+    }
+    
+    // MARK: - Node Factory Methods
+    private func createFruitNode(imageNamed: String, position: CGPoint, size: CGSize) -> SKSpriteNode {
+        let node = SKSpriteNode(imageNamed: imageNamed)
+        node.position = position
+        node.zPosition = 2
+        node.size = size
+        return node
+    }
+    
+    private func createStarNode(imageNamed: String, position: CGPoint, size: CGSize) -> SKSpriteNode {
+        let node = SKSpriteNode(imageNamed: imageNamed)
+        node.position = position
+        node.zPosition = 2
+        node.size = size
+        return node
+    }
+    
+    // MARK: - Animations
+    private func startAnimations() {
+        startLoadingAnimation()
+        startLightBounceAnimation()
     }
     
     private func startLoadingAnimation() {
-        // Мигание текста
         let blinkAction = SKAction.sequence([
-            SKAction.fadeOut(withDuration: 1),
-            SKAction.fadeIn(withDuration: 1)
+            SKAction.fadeOut(withDuration: Constants.blinkDuration),
+            SKAction.fadeIn(withDuration: Constants.blinkDuration)
         ])
         loadingLabel.run(SKAction.repeatForever(blinkAction))
     }
     
-    private func startAnimations() {
-            
-            // Анимация движения огонька вверх-вниз
-        let moveUp = SKAction.moveTo(y: size.height * 0.85, duration: 2.5)
-            moveUp.timingMode = .easeInEaseOut
-            
-            let moveDown = SKAction.moveTo(y: size.height/4, duration: 2.5)
-            moveDown.timingMode = .easeInEaseOut
-            
-            let bounceSequence = SKAction.sequence([moveDown, moveUp])
-            
-            loadingLight.run(SKAction.repeatForever(bounceSequence))
-        }
-
-    
-    private func UIElement() {
-        backgroundNode = SKSpriteNode(imageNamed: "background")
-        backgroundNode.position = CGPoint(x: size.width/2, y: size.height/2)
-        backgroundNode.size = self.size
-        backgroundNode.zPosition = -1
-        addChild(backgroundNode)
+    private func startLightBounceAnimation() {
+        let moveUp = SKAction.moveTo(y: size.height * 0.85, duration: Constants.bounceDuration)
+        moveUp.timingMode = .easeInEaseOut
         
+        let moveDown = SKAction.moveTo(y: size.height/4, duration: Constants.bounceDuration)
+        moveDown.timingMode = .easeInEaseOut
         
-        grape = SKSpriteNode(imageNamed: "grape")
-        grape.position = CGPoint(x: size.width/1.3, y: size.height/1.15)
-        grape.zPosition = 2
-        grape.size = CGSize(width: 70, height: 70)
-        addChild(grape)
-        
-        lemon = SKSpriteNode(imageNamed: "lemon")
-        lemon.position = CGPoint(x: size.width/8, y: size.height/3.2)
-        lemon.zPosition = 2
-        lemon.size = CGSize(width: 45, height: 55)
-        addChild(lemon)
-        
-        orange = SKSpriteNode(imageNamed: "orange")
-        orange.position = CGPoint(x: size.width/1.1, y: size.height/7.5)
-        orange.zPosition = 2
-        orange.size = CGSize(width: 70, height: 80)
-        addChild(orange)
-        
-        cherries = SKSpriteNode(imageNamed: "cherries")
-        cherries.position = CGPoint(x: size.width/1.08, y: size.height/2.3)
-        cherries.zPosition = 2
-        cherries.size = CGSize(width: 110, height: 120)
-        addChild(cherries)
-        
-        starsOne = SKSpriteNode(imageNamed: "starsOne")
-        starsOne.position = CGPoint(x: size.width/3.4, y: size.height/1.2)
-        starsOne.zPosition = 2
-        starsOne.size = CGSize(width: 220, height: 180)
-        addChild(starsOne)
-        
-        starsTwo = SKSpriteNode(imageNamed: "starsTwo")
-        starsTwo.position = CGPoint(x: size.width/1.5, y: size.height/1.8)
-        starsTwo.zPosition = 2
-        starsTwo.size = CGSize(width: 300, height: 222)
-        addChild(starsTwo)
-        
-        starsThree = SKSpriteNode(imageNamed: "starsThree")
-        starsThree.position = CGPoint(x: size.width/2.7, y: size.height/4.6)
-        starsThree.zPosition = 2
-        starsThree.size = CGSize(width: 280, height: 200)
-        addChild(starsThree)
-        
-        
-        loadingLight = SKSpriteNode(imageNamed: "light")
-        loadingLight.position = CGPoint(x: size.width/1.9, y: size.height/1.25)
-        loadingLight.zPosition = 5
-        loadingLight.size = CGSize(width: 301, height: 460)
-        addChild(loadingLight)
-        
-        startAnimations()
-        
-        loadingLabel = SKLabelNode(text: "Loading...")
-        loadingLabel.fontName = "Avenir-Bold"
-        loadingLabel.fontSize = 21
-        loadingLabel.fontColor = .white
-        loadingLabel.position = CGPoint(x: size.width/2, y: size.height/2)
-        addChild(loadingLabel)
-        
-        
-        
-
+        let bounceSequence = SKAction.sequence([moveDown, moveUp])
+        loadingLight.run(SKAction.repeatForever(bounceSequence))
     }
     
-    private func startTransitionTimer() {
-        
-        let waitAction = SKAction.wait(forDuration: 4.0)
+    // MARK: - Scene Transition
+    private func scheduleTransition() {
+        let waitAction = SKAction.wait(forDuration: Constants.loadingDuration)
         let transitionAction = SKAction.run { [weak self] in
             self?.transitionToMainMenu()
         }
         
         run(SKAction.sequence([waitAction, transitionAction]))
+    }
+    
+    private func transitionToMainMenu() {
+        let menuScene = MenuScene(size: size)
+        menuScene.scaleMode = scaleMode
+        view?.presentScene(menuScene, transition: SKTransition.fade(withDuration: Constants.fadeDuration))
     }
 }

@@ -11,7 +11,7 @@
 		D0403ECB2DDDD4420081BEDC /* MenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0403ECA2DDDD4420081BEDC /* MenuScene.swift */; };
 		D0403ECD2DDDD44B0081BEDC /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0403ECC2DDDD44B0081BEDC /* GameScene.swift */; };
 		D0403ECF2DDDD4550081BEDC /* SettingsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0403ECE2DDDD4550081BEDC /* SettingsScene.swift */; };
-		D0403ED12DDDD4680081BEDC /* NotificationScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0403ED02DDDD4680081BEDC /* NotificationScene.swift */; };
+		D0403ED12DDDD4680081BEDC /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0403ED02DDDD4680081BEDC /* NotificationManager.swift */; };
 		D0403ED32DDDD4720081BEDC /* WinScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0403ED22DDDD4720081BEDC /* WinScene.swift */; };
 		D0403ED52DDDD47F0081BEDC /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0403ED42DDDD47F0081BEDC /* Card.swift */; };
 		D0403ED72DDDD4880081BEDC /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0403ED62DDDD4880081BEDC /* Settings.swift */; };
@@ -48,7 +48,7 @@
 		D0403ECA2DDDD4420081BEDC /* MenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuScene.swift; sourceTree = "<group>"; };
 		D0403ECC2DDDD44B0081BEDC /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		D0403ECE2DDDD4550081BEDC /* SettingsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScene.swift; sourceTree = "<group>"; };
-		D0403ED02DDDD4680081BEDC /* NotificationScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationScene.swift; sourceTree = "<group>"; };
+		D0403ED02DDDD4680081BEDC /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		D0403ED22DDDD4720081BEDC /* WinScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WinScene.swift; sourceTree = "<group>"; };
 		D0403ED42DDDD47F0081BEDC /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		D0403ED62DDDD4880081BEDC /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
@@ -104,7 +104,6 @@
 				D0403ECA2DDDD4420081BEDC /* MenuScene.swift */,
 				D0403ECC2DDDD44B0081BEDC /* GameScene.swift */,
 				D0403ECE2DDDD4550081BEDC /* SettingsScene.swift */,
-				D0403ED02DDDD4680081BEDC /* NotificationScene.swift */,
 				D0403ED22DDDD4720081BEDC /* WinScene.swift */,
 			);
 			path = Scenes;
@@ -127,6 +126,7 @@
 				D0403ED82DDDD49D0081BEDC /* Extensions.swift */,
 				D0403EDA2DDDD4A70081BEDC /* AudioManager.swift */,
 				D0DFC5F72DE393A70068AC42 /* VibrationManager.swift */,
+				D0403ED02DDDD4680081BEDC /* NotificationManager.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -249,7 +249,7 @@
 				D0403EC92DDDD4320081BEDC /* LoadingScene.swift in Sources */,
 				D0403ED32DDDD4720081BEDC /* WinScene.swift in Sources */,
 				D0DFC62D2DE3B29B0068AC42 /* AppDelegate.swift in Sources */,
-				D0403ED12DDDD4680081BEDC /* NotificationScene.swift in Sources */,
+				D0403ED12DDDD4680081BEDC /* NotificationManager.swift in Sources */,
 				D0DFC5F82DE393A70068AC42 /* VibrationManager.swift in Sources */,
 				D0403EDB2DDDD4A70081BEDC /* AudioManager.swift in Sources */,
 				D0403ECB2DDDD4420081BEDC /* MenuScene.swift in Sources */,

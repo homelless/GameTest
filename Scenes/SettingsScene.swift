@@ -1,130 +1,235 @@
 import SpriteKit
 
-class SettingsScene: SKScene {
-
-    var backToMenu: Bool = true
+final class SettingsScene: SKScene {
+    
+    // MARK: - Constants
+    private enum Constants {
+        static let buttonSize = CGSize(width: 250, height: 61)
+        static let transitionDuration: TimeInterval = 0.3
+        static let titleFontSize: CGFloat = 36
+        static let buttonFontSize: CGFloat = 24
+        
+        enum NodeNames {
+            static let soundButton = "soundButton"
+            static let vibrationButton = "vibrationButton"
+            static let notificationButton = "notificationButton"
+            static let backButton = "backButton"
+        }
+        
+        enum Positions {
+            static let title = CGPoint(x: 0.5, y: 0.8)
+            static let sound = CGPoint(x: 0.5, y: 0.58)
+            static let vibration = CGPoint(x: 0.5, y: 0.45)
+            static let notification = CGPoint(x: 0.5, y: 0.33)
+            static let back = CGPoint(x: 0.5, y: 0.14)
+        }
+        
+        enum Colors {
+            static let enabled = SKColor.systemGreen
+            static let disabled = SKColor.systemRed
+        }
+    }
+    
+    // MARK: - Properties
+    private var previousScene: SKScene?
     private var soundButton: SKSpriteNode!
     private var vibrationButton: SKSpriteNode!
     private var backButton: SKSpriteNode!
     private var notificationButton: SKSpriteNode!
     
-    override func didMove(to view: SKView) {
-        backgroundColor = UIColor(red: 0.1, green: 0.1, blue: 0.3, alpha: 1.0)
-        
-        let titleLabel = SKLabelNode(text: "Settings")
-        titleLabel.fontName = "Avenir-Bold"
-        titleLabel.fontSize = 36
-        titleLabel.fontColor = .white
-        titleLabel.position = CGPoint(x: size.width/2, y: size.height * 0.8)
-        addChild(titleLabel)
-        
-        // Кнопка звука
-        soundButton = SKSpriteNode(color: Settings.shared.isSoundOn ? .systemGreen : .systemRed, size: CGSize(width: 300, height: 60))
-        soundButton.position = CGPoint(x: size.width/2, y: size.height * 0.6)
-        soundButton.name = "soundButton"
-        
-        let soundLabel = SKLabelNode(text: "Sound: \(Settings.shared.isSoundOn ? "ON" : "OFF")")
-        soundLabel.fontName = "Avenir-Bold"
-        soundLabel.fontSize = 24
-        soundLabel.fontColor = .white
-        soundLabel.verticalAlignmentMode = .center
-        soundButton.addChild(soundLabel)
-        
-        addChild(soundButton)
-        
-        // Кнопка вибрации
-        vibrationButton = SKSpriteNode(color: Settings.shared.isVibrationOn ? .systemGreen : .systemRed, size: CGSize(width: 300, height: 60))
-        vibrationButton.position = CGPoint(x: size.width/2, y: size.height * 0.45)
-        vibrationButton.name = "vibrationButton"
-        
-        let vibrationLabel = SKLabelNode(text: "Vibration: \(Settings.shared.isVibrationOn ? "ON" : "OFF")")
-        vibrationLabel.fontName = "Avenir-Bold"
-        vibrationLabel.fontSize = 24
-        vibrationLabel.fontColor = .white
-        vibrationLabel.verticalAlignmentMode = .center
-        vibrationButton.addChild(vibrationLabel)
-        
-        addChild(vibrationButton)
-        
-        // Кнопка уведомлений (опционально)
-        notificationButton = SKSpriteNode(color: .systemPurple, size: CGSize(width: 300, height: 60))
-        notificationButton.position = CGPoint(x: size.width/2, y: size.height * 0.3)
-        notificationButton.name = "notificationButton"
-        
-        let notificationLabel = SKLabelNode(text: "Notifications")
-        notificationLabel.fontName = "Avenir-Bold"
-        notificationLabel.fontSize = 24
-        notificationLabel.fontColor = .white
-        notificationLabel.verticalAlignmentMode = .center
-        notificationButton.addChild(notificationLabel)
-        
-        addChild(notificationButton)
-        
-        // Кнопка назад
-        backButton = SKSpriteNode(color: .systemGray, size: CGSize(width: 200, height: 50))
-        backButton.position = CGPoint(x: size.width/2, y: size.height * 0.1)
-        backButton.name = "backButton"
-        
-        let backLabel = SKLabelNode(text: "Back")
-        backLabel.fontName = "Avenir-Bold"
-        backLabel.fontSize = 24
-        backLabel.fontColor = .white
-        backLabel.verticalAlignmentMode = .center
-        backButton.addChild(backLabel)
-        
-        addChild(backButton)
-        
-        
+    // MARK: - Initialization
+    init(size: CGSize, previousScene: SKScene? = nil) {
+        self.previousScene = previousScene
+        super.init(size: size)
+        scaleMode = .aspectFill
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Lifecycle
+    override func didMove(to view: SKView) {
+        super.didMove(to: view)
+        setupScene()
+    }
+    
+    // MARK: - Scene Setup
+    private func setupScene() {
+        setupBackground()
+        setupTitle()
+        setupButtons()
+    }
+    
+    private func setupBackground() {
+        let background = SKSpriteNode(imageNamed: "backgroundSetting")
+        background.position = CGPoint(x: size.width/2, y: size.height/2)
+        background.zPosition = -1
+        background.size = self.size
+        addChild(background)
+    }
+    
+    private func setupTitle() {
+        let titleLabel = SKLabelNode(text: "Settings")
+        titleLabel.fontName = "Avenir-Bold"
+        titleLabel.fontSize = Constants.titleFontSize
+        titleLabel.fontColor = .white
+        titleLabel.position = CGPoint(
+            x: size.width * Constants.Positions.title.x,
+            y: size.height * Constants.Positions.title.y
+        )
+        addChild(titleLabel)
+    }
+    
+    private func setupButtons() {
+        soundButton = createToggleButton(
+            text: "Sound: \(Settings.shared.isSoundOn ? "ON" : "OFF")",
+            position: CGPoint(
+                x: size.width * Constants.Positions.sound.x,
+                y: size.height * Constants.Positions.sound.y
+            ),
+            name: Constants.NodeNames.soundButton,
+            isOn: Settings.shared.isSoundOn
+        )
+        addChild(soundButton)
+        
+        vibrationButton = createToggleButton(
+            text: "Vibration: \(Settings.shared.isVibrationOn ? "ON" : "OFF")",
+            position: CGPoint(
+                x: size.width * Constants.Positions.vibration.x,
+                y: size.height * Constants.Positions.vibration.y
+            ),
+            name: Constants.NodeNames.vibrationButton,
+            isOn: Settings.shared.isVibrationOn
+        )
+        addChild(vibrationButton)
+        
+        notificationButton = createToggleButton(
+            text: "Notifications: \(Settings.shared.isNotificationOn ? "ON" : "OFF")",
+            position: CGPoint(
+                x: size.width * Constants.Positions.notification.x,
+                y: size.height * Constants.Positions.notification.y
+            ),
+            name: Constants.NodeNames.notificationButton,
+            isOn: Settings.shared.isNotificationOn
+        )
+        addChild(notificationButton)
+        
+        backButton = createButton(
+            text: "Back",
+            position: CGPoint(
+                x: size.width * Constants.Positions.back.x,
+                y: size.height * Constants.Positions.back.y
+            ),
+            name: Constants.NodeNames.backButton
+        )
+        addChild(backButton)
+    }
+    
+    // MARK: - Button Factory Methods
+    private func createButton(text: String, position: CGPoint, name: String) -> SKSpriteNode {
+        let button = SKSpriteNode(imageNamed: "emptyButton")
+        button.position = position
+        button.size = Constants.buttonSize
+        button.name = name
+        
+        let label = SKLabelNode(text: text)
+        label.fontName = "Avenir-Bold"
+        label.fontSize = Constants.buttonFontSize
+        label.fontColor = .white
+        label.verticalAlignmentMode = .center
+        button.addChild(label)
+        
+        return button
+    }
+    
+    private func createToggleButton(text: String, position: CGPoint, name: String, isOn: Bool) -> SKSpriteNode {
+        let button = createButton(text: text, position: position, name: name)
+        button.color = isOn ? Constants.Colors.enabled : Constants.Colors.disabled
+        button.colorBlendFactor = 1.0
+        return button
+    }
+    
+    // MARK: - Touch Handling
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
-        let nodes = self.nodes(at: location)
         
-        for node in nodes {
-            if node.name == "soundButton" {
-             //   AudioManager.shared.playSoundEffect(name: "clickButton")
-                VibrationManager.shared.vibrate()
-                
-                Settings.shared.isSoundOn.toggle()
-                if let soundLabel = soundButton.children.first as? SKLabelNode {
-                    soundLabel.text = "Sound: \(Settings.shared.isSoundOn ? "ON" : "OFF")"
-                    soundButton.color = Settings.shared.isSoundOn ? .systemGreen : .systemRed
-                }
-            }
-            else if node.name == "vibrationButton" {
-             //   AudioManager.shared.playSoundEffect(name: "clickButton")
-                VibrationManager.shared.vibrate()
-                
-                Settings.shared.isVibrationOn.toggle()
-                if let vibrationLabel = vibrationButton.children.first as? SKLabelNode {
-                    vibrationLabel.text = "Vibration: \(Settings.shared.isVibrationOn ? "ON" : "OFF")"
-                    vibrationButton.color = Settings.shared.isVibrationOn ? .systemGreen : .systemRed
-                }
-            }
-            else if node.name == "notificationButton" {
-             //   AudioManager.shared.playSoundEffect(name: "clickButton")
-                VibrationManager.shared.vibrate()
-                
-                let notificationScene = NotificationScene(size: size)
-                notificationScene.scaleMode = scaleMode
-                view?.presentScene(notificationScene, transition: SKTransition.push(with: .left, duration: 0.3))
-            }
-            else if node.name == "backButton" {
-              //  AudioManager.shared.playSoundEffect(name: "clickButton")
-                VibrationManager.shared.vibrate()
-                
-                if backToMenu {
-                    let menuScene = MenuScene(size: size)
-                    menuScene.scaleMode = scaleMode
-                    view?.presentScene(menuScene, transition: SKTransition.push(with: .right, duration: 0.3))
-                } else {
-                    let gameScene = GameScene(size: size)
-                    gameScene.scaleMode = scaleMode
-                    view?.presentScene(gameScene, transition: SKTransition.push(with: .right, duration: 0.3))
-                }
+        for node in nodes(at: location) {
+            handleButtonTap(node)
+        }
+    }
+    
+    private func handleButtonTap(_ node: SKNode) {
+        VibrationManager.shared.vibrate()
+        
+        switch node.name {
+        case Constants.NodeNames.soundButton:
+            toggleSound()
+        case Constants.NodeNames.vibrationButton:
+            toggleVibration()
+        case Constants.NodeNames.notificationButton:
+            toggleNotifications()
+        case Constants.NodeNames.backButton:
+            handleBackButton()
+        default:
+            break
+        }
+    }
+    
+    // MARK: - Button Actions
+    private func toggleSound() {
+        Settings.shared.isSoundOn.toggle()
+        updateButtonAppearance(
+            button: soundButton,
+            isOn: Settings.shared.isSoundOn,
+            text: "Sound: \(Settings.shared.isSoundOn ? "ON" : "OFF")"
+        )
+    }
+    
+    private func toggleVibration() {
+        Settings.shared.isVibrationOn.toggle()
+        updateButtonAppearance(
+            button: vibrationButton,
+            isOn: Settings.shared.isVibrationOn,
+            text: "Vibration: \(Settings.shared.isVibrationOn ? "ON" : "OFF")"
+        )
+    }
+    
+    private func toggleNotifications() {
+        Settings.shared.isNotificationOn.toggle()
+        updateButtonAppearance(
+            button: notificationButton,
+            isOn: Settings.shared.isNotificationOn,
+            text: "Notifications: \(Settings.shared.isNotificationOn ? "ON" : "OFF")"
+        )
+    }
+    
+    private func handleBackButton() {
+        if let previousScene = previousScene {
+            let transition: SKTransition
+            
+            if previousScene is GameScene {
+                let newGameScene = GameScene(size: size)
+                transition = SKTransition.push(with: .right, duration: Constants.transitionDuration)
+                view?.presentScene(newGameScene, transition: transition)
+                AudioManager.shared.transitionToMusic(.match)
+            } else {
+                let newMenuScene = MenuScene(size: size)
+                transition = SKTransition.push(with: .right, duration: Constants.transitionDuration)
+                view?.presentScene(newMenuScene, transition: transition)
+                AudioManager.shared.transitionToMusic(.menu)
             }
         }
     }
+    
+    // MARK: - Helper Methods
+    private func updateButtonAppearance(button: SKSpriteNode, isOn: Bool, text: String) {
+        button.color = isOn ? Constants.Colors.enabled : Constants.Colors.disabled
+        
+        if let label = button.children.first as? SKLabelNode {
+            label.text = text
+        }
+    }
 }
+

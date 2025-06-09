@@ -4,23 +4,23 @@ class AudioManager {
     static let shared = AudioManager()
     
     // Музыкальные треки для разных экранов
-    enum MusicTrack: String {
+    enum musicTrack: String {
         case menu = "menu.mp3"
         case match = "match.wav"
         case win = "winSound.wav"
     }
     
     // Звуковые эффекты
-    enum SoundEffect: String {
+    enum soundEffect: String {
         case buttonClick = "clickButton.wav"
         case cardFlip = "flipCard.wav"
     }
     
     private var musicPlayer: AVAudioPlayer?
-    private var soundPlayers: [SoundEffect: AVAudioPlayer] = [:]
-    private var currentMusic: MusicTrack?
+    private var soundPlayers: [soundEffect: AVAudioPlayer] = [:]
+    private var currentMusic: musicTrack?
     
-    // Предзагрузка всех звуков
+    // Предзагрузка всех звуков доделать
     func preloadAllSounds() {
         preloadMusic()
         preloadSoundEffects()
@@ -29,7 +29,7 @@ class AudioManager {
     private func preloadMusic() {}
     
     private func preloadSoundEffects() {
-        SoundEffect.allCases.forEach { effect in
+        soundEffect.allCases.forEach { effect in
             guard let url = Bundle.main.url(forResource: effect.rawValue, withExtension: nil) else {
                 print("Effect file not found: \(effect.rawValue)")
                 return
@@ -46,7 +46,7 @@ class AudioManager {
     }
     
     // Управление музыкой
-    func playMusic(_ track: MusicTrack, loop: Bool = true) {
+    func playMusic(_ track: musicTrack, loop: Bool = true) {
         guard Settings.shared.isSoundOn else { return }
         
         // Если уже играет эта музыка, ничего не делаем
@@ -89,7 +89,7 @@ class AudioManager {
     }
     
     // Управление звуковыми эффектами
-    func playEffect(_ effect: SoundEffect, volume: Float = 1.0) {
+    func playEffect(_ effect: soundEffect, volume: Float = 1.0) {
         guard Settings.shared.isSoundOn else { return }
         
         guard let player = soundPlayers[effect] else {
@@ -114,7 +114,7 @@ class AudioManager {
     }
     
     // Плавное переключение музыки
-    func transitionToMusic(_ track: MusicTrack, fadeDuration: TimeInterval = 1.0) {
+    func transitionToMusic(_ track: musicTrack, fadeDuration: TimeInterval = 1.0) {
         guard Settings.shared.isSoundOn else { return }
         
         if currentMusic == track { return }
@@ -133,15 +133,15 @@ class AudioManager {
 }
 
 // Расширение для перечисления всех звуковых эффектов
-extension AudioManager.SoundEffect: CaseIterable {
-    static var allCases: [AudioManager.SoundEffect] = [
+extension AudioManager.soundEffect: CaseIterable {
+    static var allCases: [AudioManager.soundEffect] = [
         .buttonClick,
         .cardFlip
     ]
 }
     
-extension AudioManager.MusicTrack: CaseIterable {
-    static var allCases: [AudioManager.MusicTrack] = [
+extension AudioManager.musicTrack: CaseIterable {
+    static var allCases: [AudioManager.musicTrack] = [
             .menu,
             .match,
             .win

@@ -1,260 +1,369 @@
 import SpriteKit
 
-class GameScene: SKScene {
+final class GameScene: SKScene {
     
-    private let cardSize = CGSize(width: 77, height: 77)
-    private let spacing: CGFloat = 15
-    private let fieldMargin = UIEdgeInsets(top: 100, left: 20, bottom: 20, right: 20)
-    private var backButton: SKSpriteNode!
-    private var pauseButton: SKSpriteNode!
-    private var reloadButton: SKSpriteNode!
+    // MARK: - Constants
+    private enum Constants {
+        static let cardSize = CGSize(width: 77, height: 77)
+        static let spacing: CGFloat = 15
+        static let fieldMargin = UIEdgeInsets(top: 100, left: 20, bottom: 20, right: 20)
+        static let rows = 4
+        static let cols = 4
+        static let cardTypes = ["card1", "card2", "card3", "card4", "card5", "card6", "card7", "card8"]
+        static let initialCardShowDuration: TimeInterval = 2.0
+        static let cardFlipDelay: TimeInterval = 0.1
+        static let matchCheckDelay: TimeInterval = 0.5
+        static let mismatchDelay: TimeInterval = 1.0
+        static let fadeDuration: TimeInterval = 0.5
+        static let pushTransitionDuration: TimeInterval = 0.3
+        static let doorTransitionDuration: TimeInterval = 0.5
+        
+        enum NodeNames {
+            static let settingsButton = "settingsButton"
+            static let backButton = "back"
+            static let reloadButton = "reloadButton"
+            static let pauseButton = "pause"
+            static let continueButton = "continueButton"
+        }
+        
+        enum ZPositions {
+            static let background: CGFloat = -1
+            static let cards: CGFloat = 1
+            static let uiElements: CGFloat = 2
+            static let buttons: CGFloat = 3
+            static let pauseOverlay: CGFloat = 10
+            static let pauseUI: CGFloat = 11
+        }
+    }
     
-    
-    private var isGamePaused = false
-    private var pauseOverlay: SKSpriteNode!
-    private var continueButton: SKSpriteNode!
-    private var pauseTimeStamp: TimeInterval = 0
-    
-    
+    // MARK: - Properties
     private var cards: [Card] = []
     private var selectedCards: [Card] = []
     private var movesCount = 0
     private var startTime: TimeInterval = 0
     private var elapsedTime: TimeInterval = 0
-    private var timerLabel: SKLabelNode!
-    private var movesLabel: SKLabelNode!
-    private var settingsButton: SKSpriteNode!
-    private var background: SKSpriteNode!
-    private var labelMovesTimer : SKSpriteNode!
-    private let cardTypes = ["card1", "card2", "card3", "card4", "card5", "card6", "card7", "card8"]
-    private let rows = 4
-    private let cols = 4
+    private var isGamePaused = false
+    private var pauseTimeStamp: TimeInterval = 0
     
+    // MARK: - UI Nodes
+    private lazy var background: SKSpriteNode = {
+        let node = SKSpriteNode(imageNamed: "backgroundGame")
+        node.position = CGPoint(x: size.width/2, y: size.height/2)
+        node.zPosition = Constants.ZPositions.background
+        node.size = self.size
+        return node
+    }()
+    
+    private lazy var backButton: SKSpriteNode = {
+        createButtonNode(imageNamed: "back", name: Constants.NodeNames.backButton,
+                         position: CGPoint(x: size.width/6.2, y: size.height/7),
+                         size: CGSize(width: 43, height: 43))
+    }()
+    
+    private lazy var pauseButton: SKSpriteNode = {
+        createButtonNode(imageNamed: "pause", name: Constants.NodeNames.pauseButton,
+                         position: CGPoint(x: size.width/2, y: size.height/7),
+                         size: CGSize(width: 43, height: 43))
+    }()
+    
+    private lazy var reloadButton: SKSpriteNode = {
+        createButtonNode(imageNamed: "reload", name: Constants.NodeNames.reloadButton,
+                         position: CGPoint(x: size.width/1.2, y: size.height/7),
+                         size: CGSize(width: 43, height: 43))
+    }()
+    
+    private lazy var settingsButton: SKSpriteNode = {
+        createButtonNode(imageNamed: "settings", name: Constants.NodeNames.settingsButton,
+                         position: CGPoint(x: size.width/10, y: size.height/1.2),
+                         size: CGSize(width: 43, height: 43))
+    }()
+    
+    private lazy var labelMovesTimer: SKSpriteNode = {
+        let node = SKSpriteNode(imageNamed: "groupMoves&timer")
+        node.position = CGPoint(x: size.width/2, y: size.height/1.3)
+        node.size = CGSize(width: 380, height: 42)
+        node.zPosition = Constants.ZPositions.uiElements
+        return node
+    }()
+    
+    private lazy var timerLabel: SKLabelNode = {
+        createLabelNode(text: "Time: 0", position: CGPoint(x: size.width/1.3, y: size.height/1.313))
+    }()
+    
+    private lazy var movesLabel: SKLabelNode = {
+        createLabelNode(text: "Moves: 0", position: CGPoint(x: size.width/5.5, y: size.height/1.313))
+    }()
+    
+    private lazy var pauseOverlay: SKSpriteNode = {
+        let node = SKSpriteNode(color: .black.withAlphaComponent(0.7), size: size)
+        node.position = CGPoint(x: size.width/2, y: size.height/2)
+        node.zPosition = Constants.ZPositions.pauseOverlay
+        node.isHidden = true
+        return node
+    }()
+    
+    private lazy var continueButton: SKSpriteNode = {
+        let button = SKSpriteNode(imageNamed: "play")
+        button.position = CGPoint(x: 0, y: -50)
+        button.zPosition = Constants.ZPositions.pauseUI
+        button.name = Constants.NodeNames.continueButton
+        return button
+    }()
+    
+    // MARK: - Lifecycle
     override func didMove(to view: SKView) {
-        startTime = CACurrentMediaTime()
-        UIElements()
-        setupCards()
-        createPauseUI()
-    }
-    
-    private func UIElements() {
-        
-        backButton = SKSpriteNode(imageNamed: "back")
-        backButton.position = CGPoint(x: size.width/6.2, y: size.height/7)
-        backButton.size = CGSize(width: 43, height: 43)
-        backButton.zPosition = 3
-        backButton.name = "back"
-        addChild(backButton)
-        
-        pauseButton = SKSpriteNode(imageNamed: "pause")
-        pauseButton.position = CGPoint(x: size.width/2, y: size.height/7)
-        pauseButton.size = CGSize(width: 43, height: 43)
-        pauseButton.zPosition = 3
-        pauseButton.name = "pause"
-        addChild(pauseButton)
-        
-        
-        reloadButton = SKSpriteNode(imageNamed: "reload")
-        reloadButton.position = CGPoint(x: size.width/1.2, y: size.height/7)
-        reloadButton.size = CGSize(width: 43, height: 43)
-        reloadButton.zPosition = 3
-        reloadButton.name = "reloadButton"
-        addChild(reloadButton)
-        
-        background = SKSpriteNode(imageNamed: "backgroundGame")
-        background.position = CGPoint(x: size.width/2, y: size.height/2)
-        background.zPosition = -1
-        background.size = self.size
-        addChild(background)
-        
-        
-        // Таймер
-        timerLabel = SKLabelNode(text: "Time: 0")
-        timerLabel.fontName = "Avenir-Bold"
-        timerLabel.fontSize = 20
-        timerLabel.fontColor = .white
-        timerLabel.zPosition = 3
-        timerLabel.position = CGPoint(x: size.width/1.3, y: size.height/1.313)
-        addChild(timerLabel)
-        
-        // Счетчик ходов
-        movesLabel = SKLabelNode(text: "Movies: 0")
-        movesLabel.fontName = "Avenir-Bold"
-        movesLabel.fontSize = 20
-        movesLabel.fontColor = .white
-        movesLabel.zPosition = 3
-        movesLabel.position = CGPoint(x: size.width/5.5, y: size.height/1.313)
-        addChild(movesLabel)
-        
-        // Кнопка настроек
-        settingsButton = SKSpriteNode(imageNamed: "settings")
-        settingsButton.position = CGPoint(x: size.width/10, y: size.height/1.2)
-        settingsButton.name = "settingsButton"
-        settingsButton.size = CGSize(width: 43, height: 43)
-        addChild(settingsButton)
-        
-        // Кнопка с количеством ходов и таймером
-        labelMovesTimer = SKSpriteNode(imageNamed: "groupMoves&timer")
-        labelMovesTimer.position = CGPoint(x: size.width/2, y: size.height/1.3)
-        labelMovesTimer.size = CGSize(width: 380, height: 42)
-        labelMovesTimer.zPosition = 2
-        addChild(labelMovesTimer)
-        
-        
-    }
-    
-    private func setupCards() {
-        // Создаем пары карточек
-        var cardPairs = cardTypes + cardTypes
-        cardPairs.shuffle()
-        
-        // Расчет начальрой позиции
-        let fieldWidht = size.width - fieldMargin.left - fieldMargin.right
-        let fieldHeight = size.height - fieldMargin.top - fieldMargin.bottom
-        
-        //Проверяем, помещаются ли карты с текущими настройками
-        let requiredWigth = CGFloat(cols) * cardSize.width + CGFloat(cols - 1) * spacing
-        let requiredHeght = CGFloat(rows) * cardSize.height + CGFloat(rows - 1) * spacing
-        
-        guard requiredWigth <= fieldWidht && requiredHeght <= fieldHeight else {
-            print("Ошибка: Карты не помещаются на поле с текущими настройками")
-            return
-        }
-        
-        // Центрируем карты на доступном поле
-        let startX = fieldMargin.left + (fieldWidht - requiredWigth) / 2
-        let startY = fieldMargin.bottom + (fieldHeight - requiredHeght) / 2
-        
-        for row in 0..<rows {
-            for col in 0..<cols {
-                let index = row * cols + col
-                let cardType = cardPairs[index]
-                
-                let card = Card(type: cardType)
-                card.position = CGPoint(x: startX + CGFloat(col) * (cardSize.width + spacing) + cardSize.width/2,
-                                        y: startY + CGFloat(row) * (cardSize.height + spacing) + cardSize.height/2)
-                
-                card.size = cardSize
-                card.name = "card\(row)_\(col)"
-                
-                addChild(card)
-                cards.append(card)
-                
-                // Показываем карточки на короткое время в начале игры
-                let flipSequence = SKAction.sequence([
-                    SKAction.wait(forDuration: Double(index) * 0.1),
-                    SKAction.run { card.flipToFront() },
-                    SKAction.wait(forDuration: 2.0),
-                    SKAction.run { card.flipToBack() }
-                ])
-                card.currentFlipSequence = flipSequence
-                card.run(flipSequence)
-                
-            }
-        }
+        super.didMove(to: view)
+        setupGame()
     }
     
     override func update(_ currentTime: TimeInterval) {
+        guard !isGamePaused else { return }
+        
         elapsedTime = currentTime - startTime
         let minutes = Int(elapsedTime) / 60
         let seconds = Int(elapsedTime) % 60
         timerLabel.text = String(format: "Time: %02d:%02d", minutes, seconds)
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
-        let location = touch.location(in: self)
-        let nodes = self.nodes(at: location)
+    // MARK: - Setup Methods
+    private func setupGame() {
+        startTime = CACurrentMediaTime()
+        setupUI()
+        setupCards()
+        setupPauseUI()
+    }
+    
+    private func setupUI() {
+        addChild(background)
+        addChild(backButton)
+        addChild(pauseButton)
+        addChild(reloadButton)
+        addChild(settingsButton)
+        addChild(labelMovesTimer)
+        addChild(timerLabel)
+        addChild(movesLabel)
+    }
+    
+    private func setupPauseUI() {
+        let pauseLabel = SKLabelNode(text: "PAUSED")
+        pauseLabel.fontName = "Avenir-Black"
+        pauseLabel.fontSize = 48
+        pauseLabel.fontColor = .white
+        pauseLabel.position = CGPoint(x: 0, y: 50)
+        pauseLabel.zPosition = Constants.ZPositions.pauseUI
         
-        for node in nodes {
-            if node.name == "settingsButton" {
-                AudioManager.shared.playEffect(.buttonClick)
-                VibrationManager.shared.vibrate()
+        pauseOverlay.addChild(pauseLabel)
+        pauseOverlay.addChild(continueButton)
+        addChild(pauseOverlay)
+    }
+    
+    // MARK: - Node Factory Methods
+    private func createButtonNode(imageNamed: String, name: String, position: CGPoint, size: CGSize) -> SKSpriteNode {
+        let node = SKSpriteNode(imageNamed: imageNamed)
+        node.name = name
+        node.position = position
+        node.size = size
+        node.zPosition = Constants.ZPositions.buttons
+        return node
+    }
+    
+    private func createLabelNode(text: String, position: CGPoint) -> SKLabelNode {
+        let label = SKLabelNode(text: text)
+        label.fontName = "Avenir-Bold"
+        label.fontSize = 20
+        label.fontColor = .white
+        label.position = position
+        label.zPosition = Constants.ZPositions.uiElements
+        return label
+    }
+    
+    // MARK: - Card Management
+    private func setupCards() {
+        var cardPairs = Constants.cardTypes + Constants.cardTypes
+        cardPairs.shuffle()
+        
+        let fieldWidth = size.width - Constants.fieldMargin.left - Constants.fieldMargin.right
+        let fieldHeight = size.height - Constants.fieldMargin.top - Constants.fieldMargin.bottom
+        
+        let requiredWidth = CGFloat(Constants.cols) * Constants.cardSize.width +
+        CGFloat(Constants.cols - 1) * Constants.spacing
+        let requiredHeight = CGFloat(Constants.rows) * Constants.cardSize.height +
+        CGFloat(Constants.rows - 1) * Constants.spacing
+        
+        guard requiredWidth <= fieldWidth && requiredHeight <= fieldHeight else {
+            return
+        }
+        
+        let startX = Constants.fieldMargin.left + (fieldWidth - requiredWidth) / 2
+        let startY = Constants.fieldMargin.bottom + (fieldHeight - requiredHeight) / 2
+        
+        for row in 0..<Constants.rows {
+            for col in 0..<Constants.cols {
+                let index = row * Constants.cols + col
+                let cardType = cardPairs[index]
                 
-                let settingsScene = SettingsScene(size: size)
-                settingsScene.scaleMode = scaleMode
-                settingsScene.backToMenu = false
-                pauseGame()
-                view?.presentScene(settingsScene, transition: SKTransition.push(with: .left, duration: 0.3))
-                return
-                // новые кнопки
-            } else if node.name == "back" {
-                transitionToMainMenu()
-            }else if node.name == "reloadButton"{
-                restartGame()
-            }else if node.name == "pause"{
-                isGamePaused ? resumeGame() : pauseGame()
-                AudioManager.shared.playEffect(.buttonClick)
-                VibrationManager.shared.vibrate()
-                return
-            } else if node.name == "continueButton" {
-                resumeGame()
-                AudioManager.shared.playEffect(.buttonClick)
-                VibrationManager.shared.vibrate()
-                return
-            }
-            
-            // Блокируем взаимодействие с карточками при паузе
-            guard !isGamePaused else { continue }
-            
-            guard let card = node as? Card, !card.isFlipped, selectedCards.count < 2 else { continue }
-            
-            AudioManager.shared.playEffect(.cardFlip)
-            VibrationManager.shared.vibrate()
-            
-            card.flipToFront()
-            selectedCards.append(card)
-            
-            if selectedCards.count == 2 {
-                movesCount += 1
-                movesLabel.text = "Moves: \(movesCount)"
+                let card = Card(type: cardType)
+                card.position = CGPoint(
+                    x: startX + CGFloat(col) * (Constants.cardSize.width + Constants.spacing) + Constants.cardSize.width/2,
+                    y: startY + CGFloat(row) * (Constants.cardSize.height + Constants.spacing) + Constants.cardSize.height/2
+                )
                 
-                if selectedCards[0].type == selectedCards[1].type {
-                    // Совпадение
-                    VibrationManager.shared.vibrate(for: .success)
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.selectedCards.removeAll()
-                        
-                        // Проверка на завершение игры
-                        if self.cards.allSatisfy({ $0.isFlipped }) {
-                            self.gameWin()
-                        }
-                    }
-                } else {
-                    // Не совпали
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        self.selectedCards.forEach { $0.flipToBack() }
-                        self.selectedCards.removeAll()
-                    }
-                }
+                card.size = Constants.cardSize
+                card.name = "card\(row)_\(col)"
+                card.zPosition = Constants.ZPositions.cards
+                
+                addChild(card)
+                cards.append(card)
+                
+                let flipSequence = SKAction.sequence([
+                    SKAction.wait(forDuration: Double(index) * Constants.cardFlipDelay),
+                    SKAction.run { card.flipToFront() },
+                    SKAction.wait(forDuration: Constants.initialCardShowDuration),
+                    SKAction.run { card.flipToBack() }
+                ])
+                
+                card.currentFlipSequence = flipSequence
+                card.run(flipSequence)
             }
         }
     }
     
-    private func gameWin() {
-        AudioManager.shared.playMusic(.win)
-        VibrationManager.shared.vibrate(for: .success)
+    // MARK: - Game Logic
+    private func checkForMatch() {
+        guard selectedCards.count == 2 else { return }
         
-        let winScene = WinScene(size: size)
-        winScene.scaleMode = scaleMode
+        movesCount += 1
+        movesLabel.text = "Moves: \(movesCount)"
+        
+        if selectedCards[0].type == selectedCards[1].type {
+            // Match found
+            VibrationManager.shared.vibrate(for: .success)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + Constants.matchCheckDelay) {
+                self.selectedCards.removeAll()
+                self.checkGameCompletion()
+            }
+        } else {
+            // No match
+            DispatchQueue.main.asyncAfter(deadline: .now() + Constants.mismatchDelay) {
+                self.selectedCards.forEach { $0.flipToBack() }
+                self.selectedCards.removeAll()
+            }
+        }
+    }
+    
+    private func checkGameCompletion() {
+        if cards.allSatisfy({ $0.isFlipped }) {
+            showWinScreen()
+        }
+    }
+    
+    // MARK: - Touch Handling
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        let location = touch.location(in: self)
+        
+        for node in nodes(at: location) {
+            handleNodeTap(node)
+        }
+    }
+    
+    private func handleNodeTap(_ node: SKNode) {
+        switch node.name {
+        case Constants.NodeNames.settingsButton:
+            handleSettingsButtonTap()
+        case Constants.NodeNames.backButton:
+            handleBackButtonTap()
+        case Constants.NodeNames.reloadButton:
+            handleReloadButtonTap()
+        case Constants.NodeNames.pauseButton:
+            handlePauseButtonTap()
+        case Constants.NodeNames.continueButton:
+            handleContinueButtonTap()
+        default:
+            handleCardTap(node)
+        }
+    }
+    
+    private func handleCardTap(_ node: SKNode) {
+        guard !isGamePaused,
+              let card = node as? Card,
+              !card.isFlipped,
+              selectedCards.count < 2 else { return }
+        
+        AudioManager.shared.playEffect(.cardFlip)
+        VibrationManager.shared.vibrate()
+        
+        card.flipToFront()
+        selectedCards.append(card)
+        
+        if selectedCards.count == 2 {
+            checkForMatch()
+        }
+    }
+    
+    private func handleSettingsButtonTap() {
+        AudioManager.shared.playEffect(.buttonClick)
+        VibrationManager.shared.vibrate()
+        
+        let settingsScene = SettingsScene(size: size, previousScene: self)
+        pauseGame()
+        settingsScene.scaleMode = .aspectFill
+        view?.presentScene(settingsScene, transition: SKTransition.push(with: .left, duration: Constants.pushTransitionDuration))
+    }
+    
+    private func handleBackButtonTap() {
+        transitionToMainMenu()
+        AudioManager.shared.playMusic(.menu)
+    }
+    
+    private func handleReloadButtonTap() {
+        restartGame()
+    }
+    
+    private func handlePauseButtonTap() {
+        isGamePaused ? resumeGame() : pauseGame()
+        AudioManager.shared.playEffect(.buttonClick)
+        VibrationManager.shared.vibrate()
+    }
+    
+    private func handleContinueButtonTap() {
+        resumeGame()
+        AudioManager.shared.playEffect(.buttonClick)
+        VibrationManager.shared.vibrate()
+    }
+    
+    // MARK: - Game State Management
+    private func showWinScreen() {
+        let texture = view?.texture(from: self)
+        let frozenScene = SKSpriteNode(texture: texture)
+        frozenScene.position = CGPoint(x: size.width/2, y: size.height/2)
+        frozenScene.zPosition = 0
+        
+        let winScene = WinScene(size: self.size)
+        winScene.scaleMode = self.scaleMode
+        winScene.addChild(frozenScene)
         winScene.moves = movesCount
         winScene.time = elapsedTime
-        view?.presentScene(winScene, transition: SKTransition.moveIn(with: .down, duration: 0.5))
+        
+        view?.presentScene(winScene, transition: .fade(withDuration: Constants.fadeDuration))
     }
     
     private func transitionToMainMenu() {
         let menuScene = MenuScene(size: self.size)
         menuScene.scaleMode = self.scaleMode
-        view?.presentScene(menuScene, transition: SKTransition.doorsCloseVertical(withDuration: 0.5))
+        view?.presentScene(menuScene, transition: SKTransition.doorsCloseVertical(withDuration: Constants.doorTransitionDuration))
     }
     
-    private func restartGame() {
-        
+    func restartGame() {
         cards.forEach { $0.removeFromParent() }
         cards.removeAll()
         selectedCards.removeAll()
         setupCards()
+        resetGameStats()
+    }
+    
+    private func resetGameStats() {
         movesCount = 0
         movesLabel.text = "Moves: \(movesCount)"
         startTime = CACurrentMediaTime()
@@ -262,78 +371,35 @@ class GameScene: SKScene {
         timerLabel.text = "Time: 00:00"
     }
     
-    private func createPauseUI(){
-        // Затемнение экрана
-        pauseOverlay = SKSpriteNode(color: .black.withAlphaComponent(0.7), size: size)
-        pauseOverlay.position = CGPoint(x: size.width/2, y: size.height/2)
-        pauseOverlay.zPosition = 10
-        pauseOverlay.isHidden = true
-        addChild(pauseOverlay)
-        
-        // Текст "PAUSED"
-        let pauseLabel = SKLabelNode(text: "PAUSED")
-        pauseLabel.fontName = "Avenir-Black"
-        pauseLabel.fontSize = 48
-        pauseLabel.fontColor = .white
-        pauseLabel.position = CGPoint(x: 0, y: 50)
-        pauseLabel.zPosition = 11
-        pauseOverlay.addChild(pauseLabel)
-        
-        // Кнопка продолжения
-        continueButton = SKSpriteNode(imageNamed: "play") // Используйте свою текстуру
-        continueButton.position = CGPoint(x: 0, y: -50)
-        continueButton.zPosition = 11
-        continueButton.name = "continueButton"
-        pauseOverlay.addChild(continueButton)
-    }
-    
-    private func pauseGame() {
-        
+    // MARK: - Pause/Resume
+    func pauseGame() {
         guard !isGamePaused else { return }
         
         isGamePaused = true
         pauseTimeStamp = CACurrentMediaTime()
         
-        
-        // Сохраняем текущие анимации и останавливаем их
         cards.forEach { card in
             card.flipAnimation = card.action(forKey: "flipAnimation")
             card.removeAllActions()
+            card.isHidden = true
+            card.isUserInteractionEnabled = false
         }
-        // 1. Скрываем все карточки
-        cards.forEach { $0.isHidden = true }
         
-        // 2. Блокируем взаимодействие с карточками
-        cards.forEach { $0.isUserInteractionEnabled = false }
-        
-        // 3. Показываем оверлей паузы
         pauseOverlay.isHidden = false
-        
-        // 4. Обновляем кнопку паузы
-        pauseButton.texture = SKTexture(imageNamed: "play") // Меняем на "продолжить"
-        
-        
+        pauseButton.texture = SKTexture(imageNamed: "play")
     }
     
-    private func resumeGame() {
+    func resumeGame() {
         guard isGamePaused else { return }
         
         isGamePaused = false
-        
-        // 1. Корректируем таймер с учетом паузы
         let pauseDuration = CACurrentMediaTime() - pauseTimeStamp
         startTime += pauseDuration
         
-        // 2. Показываем карточки
-        cards.forEach { $0.isHidden = false }
-        
-        // 3. Разблокируем карточки
-        cards.forEach { $0.isUserInteractionEnabled = true }
-        
-        // 4. Скрываем оверлей паузы
-        pauseOverlay.isHidden = true
-        
         cards.forEach { card in
+            card.isHidden = false
+            card.isUserInteractionEnabled = true
+            
             if let flipAnimation = card.flipAnimation {
                 card.run(flipAnimation, withKey: "flipAnimation")
             } else if let flipSequence = card.currentFlipSequence {
@@ -341,9 +407,10 @@ class GameScene: SKScene {
             }
         }
         
-        // 5. Возвращаем иконку паузы
+        pauseOverlay.isHidden = true
         pauseButton.texture = SKTexture(imageNamed: "pause")
     }
-    
 }
+
+
 
