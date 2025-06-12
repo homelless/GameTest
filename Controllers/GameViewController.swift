@@ -16,5 +16,7 @@ class GameViewController: UIViewController {
         
         AudioManager.shared.preloadAllSounds()
         AudioManager.shared.playMusic(.menu)
+        
+        test 
     }
 }
