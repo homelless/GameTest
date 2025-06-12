@@ -17,16 +17,16 @@
 		D0403ED72DDDD4880081BEDC /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0403ED62DDDD4880081BEDC /* Settings.swift */; };
 		D0403ED92DDDD49D0081BEDC /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0403ED82DDDD49D0081BEDC /* Extensions.swift */; };
 		D0403EDB2DDDD4A70081BEDC /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0403EDA2DDDD4A70081BEDC /* AudioManager.swift */; };
-		D051EC672DE3DA9E00EA52D0 /* menu.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D051EC662DE3DA9E00EA52D0 /* menu.mp3 */; };
-		D051EC6B2DE3DD5C00EA52D0 /* match.wav in Resources */ = {isa = PBXBuildFile; fileRef = D051EC6A2DE3DD5C00EA52D0 /* match.wav */; };
-		D051EC6D2DE3DD8000EA52D0 /* flipCard.wav in Resources */ = {isa = PBXBuildFile; fileRef = D051EC6C2DE3DD8000EA52D0 /* flipCard.wav */; };
-		D051EC712DE3DDAD00EA52D0 /* winSound.wav in Resources */ = {isa = PBXBuildFile; fileRef = D051EC702DE3DDAD00EA52D0 /* winSound.wav */; };
-		D051EC732DE3DDC400EA52D0 /* clickButton.wav in Resources */ = {isa = PBXBuildFile; fileRef = D051EC722DE3DDC400EA52D0 /* clickButton.wav */; };
 		D0DFC5F82DE393A70068AC42 /* VibrationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DFC5F72DE393A70068AC42 /* VibrationManager.swift */; };
 		D0DFC5FB2DE3981A0068AC42 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DFC5FA2DE3981A0068AC42 /* GameViewController.swift */; };
-		D0DFC5FD2DE398E20068AC42 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D0DFC5FC2DE398E20068AC42 /* Assets.xcassets */; };
 		D0DFC62D2DE3B29B0068AC42 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DFC62C2DE3B29B0068AC42 /* AppDelegate.swift */; };
 		D0DFC6432DE3C1270068AC42 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DFC6422DE3C1270068AC42 /* SceneDelegate.swift */; };
+		D0EDF1622DFAC620009018B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D0DFC5FC2DE398E20068AC42 /* Assets.xcassets */; };
+		D0EDF1632DFAC627009018B8 /* menu.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D051EC662DE3DA9E00EA52D0 /* menu.mp3 */; };
+		D0EDF1642DFAC627009018B8 /* match.wav in Resources */ = {isa = PBXBuildFile; fileRef = D051EC6A2DE3DD5C00EA52D0 /* match.wav */; };
+		D0EDF1652DFAC627009018B8 /* flipCard.wav in Resources */ = {isa = PBXBuildFile; fileRef = D051EC6C2DE3DD8000EA52D0 /* flipCard.wav */; };
+		D0EDF1662DFAC627009018B8 /* winSound.wav in Resources */ = {isa = PBXBuildFile; fileRef = D051EC702DE3DDAD00EA52D0 /* winSound.wav */; };
+		D0EDF1672DFAC627009018B8 /* clickButton.wav in Resources */ = {isa = PBXBuildFile; fileRef = D051EC722DE3DDC400EA52D0 /* clickButton.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,7 +43,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		D0403EAA2DDDD3BA0081BEDC /* GameTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GameTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0403EAA2DDDD3BA0081BEDC /* Card Game .app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Card Game .app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0403EC82DDDD4320081BEDC /* LoadingScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingScene.swift; sourceTree = "<group>"; };
 		D0403ECA2DDDD4420081BEDC /* MenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuScene.swift; sourceTree = "<group>"; };
 		D0403ECC2DDDD44B0081BEDC /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -92,7 +92,7 @@
 		D0403EAB2DDDD3BA0081BEDC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D0403EAA2DDDD3BA0081BEDC /* GameTest.app */,
+				D0403EAA2DDDD3BA0081BEDC /* Card Game .app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -163,24 +163,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		D0403EA92DDDD3BA0081BEDC /* GameTest */ = {
+		D0403EA92DDDD3BA0081BEDC /* Card Game  */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D0403EC12DDDD3BC0081BEDC /* Build configuration list for PBXNativeTarget "GameTest" */;
+			buildConfigurationList = D0403EC12DDDD3BC0081BEDC /* Build configuration list for PBXNativeTarget "Card Game " */;
 			buildPhases = (
 				D0403EA62DDDD3BA0081BEDC /* Sources */,
 				D0403EA72DDDD3BA0081BEDC /* Frameworks */,
-				D0403EA82DDDD3BA0081BEDC /* Resources */,
 				D0DFC6082DE3AAF20068AC42 /* Embed Frameworks */,
+				D0EDF1612DFAC619009018B8 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = GameTest;
+			name = "Card Game ";
 			packageProductDependencies = (
 			);
 			productName = GameTest;
-			productReference = D0403EAA2DDDD3BA0081BEDC /* GameTest.app */;
+			productReference = D0403EAA2DDDD3BA0081BEDC /* Card Game .app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -199,7 +199,7 @@
 					};
 				};
 			};
-			buildConfigurationList = D0403EA52DDDD3BA0081BEDC /* Build configuration list for PBXProject "GameTest" */;
+			buildConfigurationList = D0403EA52DDDD3BA0081BEDC /* Build configuration list for PBXProject "Card Game " */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -213,22 +213,22 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D0403EA92DDDD3BA0081BEDC /* GameTest */,
+				D0403EA92DDDD3BA0081BEDC /* Card Game  */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		D0403EA82DDDD3BA0081BEDC /* Resources */ = {
+		D0EDF1612DFAC619009018B8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D051EC672DE3DA9E00EA52D0 /* menu.mp3 in Resources */,
-				D051EC712DE3DDAD00EA52D0 /* winSound.wav in Resources */,
-				D0DFC5FD2DE398E20068AC42 /* Assets.xcassets in Resources */,
-				D051EC6D2DE3DD8000EA52D0 /* flipCard.wav in Resources */,
-				D051EC6B2DE3DD5C00EA52D0 /* match.wav in Resources */,
-				D051EC732DE3DDC400EA52D0 /* clickButton.wav in Resources */,
+				D0EDF1632DFAC627009018B8 /* menu.mp3 in Resources */,
+				D0EDF1642DFAC627009018B8 /* match.wav in Resources */,
+				D0EDF1652DFAC627009018B8 /* flipCard.wav in Resources */,
+				D0EDF1662DFAC627009018B8 /* winSound.wav in Resources */,
+				D0EDF1672DFAC627009018B8 /* clickButton.wav in Resources */,
+				D0EDF1622DFAC620009018B8 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,7 +452,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		D0403EA52DDDD3BA0081BEDC /* Build configuration list for PBXProject "GameTest" */ = {
+		D0403EA52DDDD3BA0081BEDC /* Build configuration list for PBXProject "Card Game " */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D0403EBF2DDDD3BC0081BEDC /* Debug */,
@@ -461,7 +461,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D0403EC12DDDD3BC0081BEDC /* Build configuration list for PBXNativeTarget "GameTest" */ = {
+		D0403EC12DDDD3BC0081BEDC /* Build configuration list for PBXNativeTarget "Card Game " */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D0403EC22DDDD3BC0081BEDC /* Debug */,

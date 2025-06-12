@@ -17,6 +17,7 @@ class AudioManager {
     }
     
     private var musicPlayer: AVAudioPlayer?
+    private var musicPlayers: [musicTrack: AVAudioPlayer] = [:]
     private var soundPlayers: [soundEffect: AVAudioPlayer] = [:]
     private var currentMusic: musicTrack?
     
@@ -26,7 +27,22 @@ class AudioManager {
         preloadSoundEffects()
     }
     
-    private func preloadMusic() {}
+    private func preloadMusic() {
+        musicTrack.allCases.forEach { track in
+            guard let url = Bundle.main.url(forResource: track.rawValue, withExtension: nil) else {
+                print("Effect file not found: \(track.rawValue)")
+                return
+            }
+            
+            do {
+                let player = try AVAudioPlayer(contentsOf: url)
+                player.prepareToPlay()
+                musicPlayers[track] = player
+            } catch {
+                print("Error loading \(track.rawValue):", error)
+            }
+        }
+    }
     
     private func preloadSoundEffects() {
         soundEffect.allCases.forEach { effect in
@@ -147,78 +163,3 @@ extension AudioManager.musicTrack: CaseIterable {
             .win
     ]
 }
-//    private var player: AVAudioPlayer?
-//    private var soundEffectPlayers: [String: AVAudioPlayer] = [:]
-//    private let soundEffects = [
-//        "clickButton",
-//        "flipCard",
-//        "match",
-//        "winSound"
-//    ]
-//    
-//    func preloadSounds(soundFiles: [String]) {
-//            for file in soundFiles {
-//                guard let url = Bundle.main.url(forResource: file, withExtension: nil) else {
-//                    print("Файл \(file) не найден")
-//                    continue
-//                }
-//                
-//                do {
-//                    let player = try AVAudioPlayer(contentsOf: url)
-//                    player.prepareToPlay()
-//                    soundEffectPlayers[file] = player
-//                } catch {
-//                    print("Ошибка загрузки \(file):", error)
-//                }
-//            }
-//        }
-//    
-//    
-//    
-//    
-//    
-//    
-//    func playMusic(name: String) {
-//        guard let url = Bundle.main.url(forResource: name, withExtension: nil) else {
-//            return
-//        }
-//        do {
-//            player = try AVAudioPlayer(contentsOf: url)
-//            player?.numberOfLoops = -1 // Бесконечный цикл
-//            player?.volume = 0.5
-//            player?.prepareToPlay()
-//            player?.play()
-//        } catch {
-//            print("Ошибка воспроизведения:", error.localizedDescription)
-//        }
-//    }
-//    
-//    func playEffect(name: String) {
-//        guard let url = Bundle.main.url(forResource: name, withExtension: nil) else {
-//            return
-//        }
-//        do {
-//            player = try AVAudioPlayer(contentsOf: url)
-//            player?.numberOfLoops = 1
-//            player?.volume = 1
-//            player?.prepareToPlay()
-//            player?.play()
-//        } catch {
-//            print("Ошибка воспроизведения:", error.localizedDescription)
-//        }
-//    }
-//   
-//    func stopMusic(name: String) {
-//        player?.stop()
-//        player = nil
-//    }
-//    
-//    func updateSoundState() {
-//        if Settings.shared.isSoundOn {
-//            player?.play()
-//        } else {
-//            player?.pause()
-//        }
-//    }
-//}
-

@@ -30,6 +30,7 @@ final class SettingsScene: SKScene {
         }
     }
     
+    
     // MARK: - Properties
     private var previousScene: SKScene?
     private var soundButton: SKSpriteNode!
@@ -162,15 +163,19 @@ final class SettingsScene: SKScene {
     
     private func handleButtonTap(_ node: SKNode) {
         VibrationManager.shared.vibrate()
+       
         
         switch node.name {
         case Constants.NodeNames.soundButton:
             toggleSound()
         case Constants.NodeNames.vibrationButton:
+            AudioManager.shared.playEffect(.buttonClick)
             toggleVibration()
         case Constants.NodeNames.notificationButton:
+            AudioManager.shared.playEffect(.buttonClick)
             toggleNotifications()
         case Constants.NodeNames.backButton:
+            AudioManager.shared.playEffect(.buttonClick)
             handleBackButton()
         default:
             break

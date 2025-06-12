@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D0403EA92DDDD3BA0081BEDC"
-               BuildableName = "GameTest.app"
-               BlueprintName = "GameTest"
-               ReferencedContainer = "container:GameTest.xcodeproj">
+               BuildableName = "Card Game .app"
+               BlueprintName = "Card Game "
+               ReferencedContainer = "container:Card Game .xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D0403EA92DDDD3BA0081BEDC"
-            BuildableName = "GameTest.app"
-            BlueprintName = "GameTest"
-            ReferencedContainer = "container:GameTest.xcodeproj">
+            BuildableName = "Card Game .app"
+            BlueprintName = "Card Game "
+            ReferencedContainer = "container:Card Game .xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -69,9 +69,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D0403EA92DDDD3BA0081BEDC"
-            BuildableName = "GameTest.app"
-            BlueprintName = "GameTest"
-            ReferencedContainer = "container:GameTest.xcodeproj">
+            BuildableName = "Card Game .app"
+            BlueprintName = "Card Game "
+            ReferencedContainer = "container:Card Game .xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -1,8 +1,6 @@
 import UIKit
 import SpriteKit
 
-
-
 class GameViewController: UIViewController {
     override func loadView() {
         self.view = SKView(frame: UIScreen.main.bounds)

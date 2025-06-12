@@ -255,6 +255,7 @@ final class GameScene: SKScene {
     private func checkGameCompletion() {
         if cards.allSatisfy({ $0.isFlipped }) {
             showWinScreen()
+            AudioManager.shared.playMusic(.win)
         }
     }
     
@@ -313,11 +314,15 @@ final class GameScene: SKScene {
     }
     
     private func handleBackButtonTap() {
+        AudioManager.shared.playEffect(.buttonClick)
+        VibrationManager.shared.vibrate()
         transitionToMainMenu()
         AudioManager.shared.playMusic(.menu)
     }
     
     private func handleReloadButtonTap() {
+        AudioManager.shared.playEffect(.buttonClick)
+        VibrationManager.shared.vibrate()
         restartGame()
     }
     
@@ -343,10 +348,10 @@ final class GameScene: SKScene {
         let winScene = WinScene(size: self.size)
         winScene.scaleMode = self.scaleMode
         winScene.addChild(frozenScene)
-        winScene.moves = movesCount
-        winScene.time = elapsedTime
         
         view?.presentScene(winScene, transition: .fade(withDuration: Constants.fadeDuration))
+        winScene.moves = movesCount
+        winScene.time = elapsedTime
     }
     
     private func transitionToMainMenu() {

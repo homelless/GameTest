@@ -10,7 +10,6 @@ class Card: SKSpriteNode {
     
     private var backTexture = SKTexture(imageNamed: "card_back")
     
-  
     init(type: String) {
         self.type = type
         self.frontTexture = SKTexture(imageNamed: type)
