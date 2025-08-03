@@ -39,6 +39,7 @@ final class SettingsScene: SKScene {
     private var notificationButton: SKSpriteNode!
     
     // MARK: - Initialization
+    // инициализация с передачей предыдущей сцены
     init(size: CGSize, previousScene: SKScene? = nil) {
         self.previousScene = previousScene
         super.init(size: size)
@@ -128,12 +129,14 @@ final class SettingsScene: SKScene {
     }
     
     // MARK: - Button Factory Methods
+    // создание обычной кнопки
     private func createButton(text: String, position: CGPoint, name: String) -> SKSpriteNode {
         let button = SKSpriteNode(imageNamed: "emptyButton")
         button.position = position
         button.size = Constants.buttonSize
         button.name = name
         
+    // добавление текста на кнопку
         let label = SKLabelNode(text: text)
         label.fontName = "Avenir-Bold"
         label.fontSize = Constants.buttonFontSize
@@ -143,7 +146,7 @@ final class SettingsScene: SKScene {
         
         return button
     }
-    
+    // переключение кнопки с изменением цвета
     private func createToggleButton(text: String, position: CGPoint, name: String, isOn: Bool) -> SKSpriteNode {
         let button = createButton(text: text, position: position, name: name)
         button.color = isOn ? Constants.Colors.enabled : Constants.Colors.disabled
@@ -152,6 +155,7 @@ final class SettingsScene: SKScene {
     }
     
     // MARK: - Touch Handling
+    // обработка касаний 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)

@@ -146,15 +146,18 @@ final class MenuScene: SKScene {
     }
     
     // MARK: - Touch Handling
+    // обработка касаний
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
         
+        // проверка на затронутые узлы
         for node in nodes(at: location) {
             handleButtonTap(on: node)
         }
     }
     
+    // обработка нажатия кнопок
     private func handleButtonTap(on node: SKNode) {
         switch node.name {
         case Constants.NodeNames.playButton:

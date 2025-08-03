@@ -187,7 +187,7 @@ class WinScene: SKScene {
         addChild(label)
         return label
     }
-    
+    // преобразование относительных координат в абсолютные
     private func relativePosition(for relativePoint: CGPoint) -> CGPoint {
         CGPoint(x: size.width / relativePoint.x, y: size.height / relativePoint.y)
     }

@@ -116,6 +116,7 @@ final class GameScene: SKScene {
         setupGame()
     }
     
+    // обновление игрового состояния
     override func update(_ currentTime: TimeInterval) {
         guard !isGamePaused else { return }
         
@@ -178,13 +179,16 @@ final class GameScene: SKScene {
     }
     
     // MARK: - Card Management
+    // настройка карточек (создание и перешивание)
     private func setupCards() {
         var cardPairs = Constants.cardTypes + Constants.cardTypes
         cardPairs.shuffle()
         
+        // размеры игрового поля
         let fieldWidth = size.width - Constants.fieldMargin.left - Constants.fieldMargin.right
         let fieldHeight = size.height - Constants.fieldMargin.top - Constants.fieldMargin.bottom
         
+        // проверка ращмещения карточек
         let requiredWidth = CGFloat(Constants.cols) * Constants.cardSize.width +
         CGFloat(Constants.cols - 1) * Constants.spacing
         let requiredHeight = CGFloat(Constants.rows) * Constants.cardSize.height +
@@ -194,9 +198,11 @@ final class GameScene: SKScene {
             return
         }
         
+        // начальные координаты
         let startX = Constants.fieldMargin.left + (fieldWidth - requiredWidth) / 2
         let startY = Constants.fieldMargin.bottom + (fieldHeight - requiredHeight) / 2
         
+        // создаем и размешиваем карточки
         for row in 0..<Constants.rows {
             for col in 0..<Constants.cols {
                 let index = row * Constants.cols + col
@@ -215,6 +221,7 @@ final class GameScene: SKScene {
                 addChild(card)
                 cards.append(card)
                 
+                // анимация первоначального показывания карточек
                 let flipSequence = SKAction.sequence([
                     SKAction.wait(forDuration: Double(index) * Constants.cardFlipDelay),
                     SKAction.run { card.flipToFront() },
@@ -229,6 +236,7 @@ final class GameScene: SKScene {
     }
     
     // MARK: - Game Logic
+    // проверка совпадений
     private func checkForMatch() {
         guard selectedCards.count == 2 else { return }
         
@@ -236,7 +244,7 @@ final class GameScene: SKScene {
         movesLabel.text = "Moves: \(movesCount)"
         
         if selectedCards[0].type == selectedCards[1].type {
-            // Match found
+            // совпадение
             VibrationManager.shared.vibrate(for: .success)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + Constants.matchCheckDelay) {
@@ -244,7 +252,7 @@ final class GameScene: SKScene {
                 self.checkGameCompletion()
             }
         } else {
-            // No match
+            // не совпадение
             DispatchQueue.main.asyncAfter(deadline: .now() + Constants.mismatchDelay) {
                 self.selectedCards.forEach { $0.flipToBack() }
                 self.selectedCards.removeAll()
@@ -252,6 +260,7 @@ final class GameScene: SKScene {
         }
     }
     
+    // проверка завершения игры
     private func checkGameCompletion() {
         if cards.allSatisfy({ $0.isFlipped }) {
             showWinScreen()
@@ -260,6 +269,7 @@ final class GameScene: SKScene {
     }
     
     // MARK: - Touch Handling
+    // обработка касаний 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         let location = touch.location(in: self)
